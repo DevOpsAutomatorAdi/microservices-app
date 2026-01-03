@@ -1,109 +1,101 @@
 🚀 DevOps Microservices Platform
-HTTP → HTTPS Migration using Apache Reverse Proxy on AWS EC2
+HTTP → HTTPS with Apache Reverse Proxy on AWS EC2
 📌 Project Overview
 
-This project demonstrates a production-grade DevOps microservices architecture deployed on AWS EC2, using Python (Flask) microservices exposed securely via an Apache Reverse Proxy with HTTPS enabled using Let’s Encrypt.
+This repository demonstrates a production-style DevOps microservices platform deployed on AWS EC2:
 
-Each microservice runs independently on internal HTTP ports and is accessed externally through subdomain-based routing. Apache acts as a single secure entry point, handling SSL termination, routing, and redirection.
+✔ Microservices in Python (Flask)
+✔ Apache as a reverse proxy
+✔ Subdomain routing for services
+✔ HTTPS enabled via Let’s Encrypt / Certbot
+✔ Clean HTTP → HTTPS redirection
 
-A core objective of this project is to showcase a real-world HTTP → HTTPS migration, a critical responsibility of DevOps engineers in production environments.
+The platform is designed to reflect real-world tasks that DevOps engineers handle—secure traffic routing, SSL termination, and scalable service isolation.
 
-🏗️ Architecture – Logical View
+🧠 High-Level Architecture
 User Browser
      |
-     |  HTTPS (443)
+     | HTTPS (443)
      v
 Apache Reverse Proxy (AWS EC2)
      |
-     |-- aditechsphere.publicvm.com
-     |      → Homepage Service (127.0.0.1:5000)
+     |– aditechsphere.publicvm.com
+     |     → Homepage Service (127.0.0.1:5000)
      |
-     |-- microservice1.aditechsphere.publicvm.com
-     |      → Orders Service (127.0.0.1:5001)
+     |– microservice1.aditechsphere.publicvm.com
+     |     → Orders Service (127.0.0.1:5001)
      |
-     |-- microservice2.aditechsphere.publicvm.com
-            → Payments Service (127.0.0.1:5002)
+     |– microservice2.aditechsphere.publicvm.com
+           → Payments Service (127.0.0.1:5002)
 
-🧩 Microservices in This Project
-Service Name	Description	Internal Port
-Homepage Service	Central dashboard / landing page	5000
-Orders Service	Independent backend microservice	5001
-Payments Service	Independent backend microservice	5002
+🧩 Project Components
+Service	Description	Local Port
+Homepage Service	Main dashboard	📍 5000
+Orders Service	Orders microservice	📍 5001
+Payments Service	Payments microservice	📍 5002
 🚀 Tech Stack
 
-Python 3
-
-Flask
+Python 3 & Flask
 
 Apache HTTP Server
 
+AWS EC2 (Ubuntu)
+
+DNS Subdomains
+
+Let’s Encrypt + Certbot
+
 Reverse Proxy & SSL Termination
 
-AWS EC2 (Ubuntu Linux)
-
-DNS & Subdomain Routing
-
-Let’s Encrypt (Certbot)
-
-📂 Project Structure
+📂 Repository Structure
 microservices-app/
 │
 ├── homepage/
 │   └── app.py
-│
 ├── microservice1/
 │   └── app.py
-│
 ├── microservice2/
 │   └── app.py
-│
 └── README.md
 
-🌐 Domain Mapping
-Public URL	Service
-http://aditechsphere.publicvm.com
-	Homepage
-http://microservice1.aditechsphere.publicvm.com
-	Orders Service
-http://microservice2.aditechsphere.publicvm.com
-	Payments Service
+🌐 Live Domain Mapping
+Domain	Service
+aditechsphere.publicvm.com	Homepage
+microservice1.aditechsphere.publicvm.com	Orders Service
+microservice2.aditechsphere.publicvm.com	Payments Service
 
-All HTTP traffic is permanently redirected to HTTPS.
+All HTTP requests are redirected permanently to HTTPS.
 
-🛠️ Step-by-Step Deployment Guide
-🔹 Step 1: Launch EC2 Instance
+🛠️ Deployment Guide
+1️⃣ Launch EC2 Instance
 
-Launch Ubuntu EC2
-
-Allow inbound traffic:
+✔ Ubuntu Server
+✔ Open Inbound Ports:
 
 80 (HTTP)
 
 443 (HTTPS)
 
-Attach Elastic IP (recommended for stable DNS)
+✔ Assign Elastic IP (recommended)
 
-🔹 Step 2: Install Required Packages
+2️⃣ Install Packages
 sudo apt update
 sudo apt install python3 python3-pip python3-venv apache2 -y
 
 
-Enable Apache modules:
+Enable required Apache modules:
 
-sudo a2enmod proxy proxy_http headers rewrite
+sudo a2enmod proxy proxy_http headers rewrite ssl
 sudo systemctl restart apache2
 
-🔹 Step 3: Setup Python Virtual Environment
+3️⃣ Setup Python Environment
 mkdir ~/microservices-app
 cd ~/microservices-app
 python3 -m venv venv
 source venv/bin/activate
 pip install flask
 
-🔹 Step 4: Run Flask Microservices
-
-Each service runs internally on localhost.
-
+4️⃣ Run Each Flask Microservice
 # Homepage
 python homepage/app.py
 
@@ -113,31 +105,16 @@ python microservice1/app.py
 # Payments Service
 python microservice2/app.py
 
+5️⃣ DNS Configuration
 
-Internal ports:
+Add DNS A records:
 
-127.0.0.1:5000
-
-127.0.0.1:5001
-
-127.0.0.1:5002
-
-🔹 Step 5: Configure DNS
-
-Create A records pointing to the EC2 public IP:
-
-aditechsphere.publicvm.com               → EC2_IP
+aditechsphere.publicvm.com              → EC2_IP
 microservice1.aditechsphere.publicvm.com → EC2_IP
 microservice2.aditechsphere.publicvm.com → EC2_IP
 
-
-Wildcard records can also be used but are not required.
-
-🔄 Apache Reverse Proxy Configuration (HTTP → HTTPS)
-
-Apache exposes each microservice via subdomains and forces HTTPS redirection.
-
-🏠 Homepage – HTTP VirtualHost
+6️⃣ Apache Reverse Proxy (HTTP → HTTPS)
+Homepage – HTTP Config
 <VirtualHost *:80>
     ServerName aditechsphere.publicvm.com
 
@@ -145,11 +122,11 @@ Apache exposes each microservice via subdomains and forces HTTPS redirection.
     ProxyPass / http://127.0.0.1:5000/
     ProxyPassReverse / http://127.0.0.1:5000/
 
-    RewriteEngine on
+    RewriteEngine On
     RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 </VirtualHost>
 
-🛒 Orders Service – HTTP VirtualHost
+Orders – HTTP Config
 <VirtualHost *:80>
     ServerName microservice1.aditechsphere.publicvm.com
 
@@ -157,11 +134,11 @@ Apache exposes each microservice via subdomains and forces HTTPS redirection.
     ProxyPass / http://127.0.0.1:5001/
     ProxyPassReverse / http://127.0.0.1:5001/
 
-    RewriteEngine on
+    RewriteEngine On
     RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 </VirtualHost>
 
-💳 Payments Service – HTTP VirtualHost
+Payments – HTTP Config
 <VirtualHost *:80>
     ServerName microservice2.aditechsphere.publicvm.com
 
@@ -169,12 +146,12 @@ Apache exposes each microservice via subdomains and forces HTTPS redirection.
     ProxyPass / http://127.0.0.1:5002/
     ProxyPassReverse / http://127.0.0.1:5002/
 
-    RewriteEngine on
+    RewriteEngine On
     RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 </VirtualHost>
 
 
-Enable sites and reload Apache:
+Enable sites & reload Apache:
 
 sudo a2ensite *.conf
 sudo apachectl configtest
@@ -184,21 +161,17 @@ sudo systemctl reload apache2
 Install Certbot
 sudo apt install certbot python3-certbot-apache -y
 
-Generate SSL Certificate
+Run Certbot
 sudo certbot --apache -d aditechsphere.publicvm.com
 
 
-Certbot:
+This will:
+✔ Validate DNS
+✔ Issue SSL cert
+✔ Configure Apache SSL settings
+✔ Set up auto-renewal
 
-Verifies DNS ownership
-
-Issues SSL certificates
-
-Auto-configures Apache
-
-Enables auto-renewal
-
-HTTPS VirtualHost Example
+Example HTTPS VirtualHost
 <VirtualHost *:443>
     ServerName aditechsphere.publicvm.com
 
@@ -212,48 +185,36 @@ HTTPS VirtualHost Example
 </VirtualHost>
 
 
-(Same pattern applies to other microservices.)
+Repeat for other subdomains.
 
-🔁 How HTTP Still Works Internally
-
-Flask services run on HTTP (localhost)
-
-Apache performs SSL termination
-
-External HTTP → HTTPS redirection
-
-Internal traffic remains unencrypted (trusted network)
-
-Browser → HTTPS → Apache → HTTP → Flask
+🔁 HTTP & HTTPS Flow
+Flask (internal HTTP) 
+    ↓
+Apache (SSL Termination)
+    ↓
+HTTPS Served to Browser
 
 
-✔ This is standard production architecture
+✔ Flask stays on HTTP internally
+✔ SSL is terminated at Apache
+✔ HTTP requests auto-redirect to HTTPS
 
 🔒 Security Best Practices
 
-Flask services bound to 127.0.0.1
+✔ Bind Flask apps to localhost
+✔ Firewall block internal ports
+✔ Use strong SSL configuration
+✔ Certbot auto-renews certificates
+✔ Apache as single trusted entry point
 
-Apache is the only public entry point
+🌟 Why This Project Matters for DevOps
 
-SSL auto-renewal via Certbot
+Real-world reverse proxy implementation
 
-Internal ports (5000–5002) can be firewalled
+HTTPS enablement without downtime
 
-Clear separation of edge and application layers
+Integration of DNS, Apache, certbot, and EC2
 
-🎯 Why This Project Is Strong for DevOps Roles
+Microservices with isolated service routing
 
-Real Apache reverse-proxy configuration
-
-HTTPS migration without downtime
-
-Subdomain-based microservices routing
-
-Production-grade documentation
-
-Easily extendable to Docker, Kubernetes, ALB, CI/CD
-
-👨‍💻 Author
-
-Aditya Sirsam
-DevOps Engineer | AWS | Linux | Docker | Kubernetes
+Can be extended to Docker, Kubernetes, ALB, etc.
