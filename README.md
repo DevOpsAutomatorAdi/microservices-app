@@ -50,7 +50,61 @@ flowchart TB
 - Let’s Encrypt (Certbot)
 
 ---
+## 📸 Screenshots
 
+This section showcases the working platform and individual microservices exposed securely via Apache Reverse Proxy over HTTPS.
+
+### 🏠 Platform Dashboard (Homepage Service)
+
+Central landing page routed via
+https://aditechsphere.publicvm.com
+
+📍 Purpose:
+- Entry point for the platform
+- Links to all microservices
+- Demonstrates HTTPS termination at Apache
+
+
+
+![Platform Dashboard](screenshots/homepage.png)
+
+### 🛒 Microservice 1 – Orders Service
+
+Independent backend microservice routed via
+https://microservice1.aditechsphere.publicvm.com
+
+📍 Purpose:
+- Demonstrates subdomain-based routing
+- Runs on internal port 5001
+- Exposed securely through Apache
+
+
+
+![Orders Microservice](screenshots/microservice1.png)
+
+### 💳 Microservice 2 – Payments Service
+
+Independent backend microservice routed via
+https://microservice2.aditechsphere.publicvm.com
+
+📍 Purpose:
+- Demonstrates isolated service deployment
+- Runs on internal port 5002
+- HTTPS enforced at the proxy layer
+
+
+
+![Payments Microservice](screenshots/microservice2.png)
+
+## 📂 Screenshots Directory Structure
+
+Create a folder in your repository:
+```text
+screenshots/
+├── homepage.png
+├── microservice1.png
+└── microservice2.png
+```
 ## 📁 Project Structure
 
 ```text
@@ -256,8 +310,28 @@ Browser → HTTPS → Apache → HTTP → Flask
 - Clean separation of layers
 
 ---
-
+## 🔮 Future Enhancements
+Docker & Docker Compose
+Kubernetes deployment
+CI/CD using Jenkins
+Monitoring with Prometheus & Grafana AWS ALB integration
 ## 👨‍💻 Author
 
 **Aditya Sirsam**  
 DevOps Engineer | AWS | Linux | Docker | Kubernetes
+
+---
+
+### ✅ Result
+✔ 100% GitHub-ready  
+✔ Mermaid diagram renders correctly  
+✔ Recruiter-friendly  
+✔ Production DevOps standard  
+
+If you want next:
+- 📸 **Where to add screenshots**
+- 🐳 **Docker version README**
+- ☸️ **Kubernetes version**
+- 🏷️ **GitHub badges**
+
+Just tell me 🔥
