@@ -75,7 +75,153 @@ microservices-app/
 | microservice2.aditechsphere.publicvm.com | Payments Service |
 
 ---
+## Configure Apache Reverse Proxy (HTTP)
 
+Apache exposes each microservice via subdomains and forwards traffic to internal Flask ports.
+
+All HTTP traffic is configured to redirect permanently to HTTPS.
+
+#### Homepage – HTTP Config
+File: /etc/apache2/sites-available/aditechsphere.publicvm.com.conf
+
+<VirtualHost *:80>
+    ServerName aditechsphere.publicvm.com
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:5000/
+    ProxyPassReverse / http://127.0.0.1:5000/
+
+    ErrorLog ${APACHE_LOG_DIR}/home_error.log
+    CustomLog ${APACHE_LOG_DIR}/home_access.log combined
+
+    RewriteEngine on
+    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+#### Microservice 1 – HTTP Config
+<VirtualHost *:80>
+    ServerName microservice1.aditechsphere.publicvm.com
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:5001/
+    ProxyPassReverse / http://127.0.0.1:5001/
+
+    ErrorLog ${APACHE_LOG_DIR}/ms1_error.log
+    CustomLog ${APACHE_LOG_DIR}/ms1_access.log combined
+
+    RewriteEngine on
+    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+####  Microservice 2 – HTTP Config
+<VirtualHost *:80>
+    ServerName microservice2.aditechsphere.publicvm.com
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:5002/
+    ProxyPassReverse / http://127.0.0.1:5002/
+
+    ErrorLog ${APACHE_LOG_DIR}/ms2_error.log
+    CustomLog ${APACHE_LOG_DIR}/ms2_access.log combined
+
+    RewriteEngine on
+    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+
+Enable sites:
+
+sudo a2ensite aditechsphere.publicvm.com.conf
+sudo a2ensite microservice1.aditechsphere.publicvm.com.conf
+sudo a2ensite microservice2.aditechsphere.publicvm.com.conf
+sudo apachectl configtest
+sudo systemctl reload apache2
+## Enable HTTPS with Let’s Encrypt
+#### Install Certbot
+sudo apt install certbot python3-certbot-apache -y
+
+#### Generate SSL Certificate
+sudo certbot --apache -d aditechsphere.publicvm.com
+
+
+##### Certbot:
+
+Verifies domain ownership
+
+Generates SSL certificates
+
+Stores them under /etc/letsencrypt/live/
+
+Installs SSL helper config
+
+#### 🔹HTTPS VirtualHosts (443)
+
+Each service has its own SSL VirtualHost using the same certificate.
+
+###### Example (Homepage):
+
+
+
+<VirtualHost *:443>
+    ServerName aditechsphere.publicvm.com
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:5000/
+    ProxyPassReverse / http://127.0.0.1:5000/
+
+    SSLCertificateFile /etc/letsencrypt/live/aditechsphere.publicvm.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/aditechsphere.publicvm.com/privkey.pem
+    Include /etc/letsencrypt/options-ssl-apache.conf
+</VirtualHost>
+
+
+(Same pattern for microservice1 and microservice2.)
+
+##### Enable SSL:
+
+sudo a2enmod ssl
+sudo a2ensite aditechsphere.publicvm.com-le-ssl.conf
+sudo a2ensite microservice1.aditechsphere.publicvm.com-le-ssl.conf
+sudo a2ensite microservice2.aditechsphere.publicvm.com-le-ssl.conf
+sudo apachectl configtest
+sudo systemctl reload apache2
+
+### 🔁 How HTTP Continues to Work After HTTPS
+
+Flask apps continue running on HTTP internally
+
+Apache performs SSL termination
+
+HTTP requests are redirected to HTTPS
+
+Internal traffic remains unencrypted (trusted network)
+
+Browser → HTTPS → Apache → HTTP → Flask
+
+
+This is standard production architecture.
+
+## 🔒 Security Notes
+
+Flask ports are bound to localhost
+
+Apache is the only public entry point
+
+SSL auto-renews via Certbot
+
+Ports 5000–5002 can be firewalled for hardening
+
+## 🎯 Why This Project Is Strong for DevOps Roles
+
+Real reverse-proxy configuration
+
+HTTPS migration with zero downtime
+
+Subdomain-based microservices
+
+Production-grade documentation
+
+Easily extendable to Docker / Kubernetes / ALB
 ## 🛠️ Deployment Summary
 
 - EC2 Ubuntu instance
