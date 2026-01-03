@@ -83,7 +83,7 @@ All HTTP traffic is configured to redirect permanently to HTTPS.
 
 #### Homepage – HTTP Config
 File: /etc/apache2/sites-available/aditechsphere.publicvm.com.conf
-
+```cmd
 <VirtualHost *:80>
     ServerName aditechsphere.publicvm.com
 
@@ -97,8 +97,9 @@ File: /etc/apache2/sites-available/aditechsphere.publicvm.com.conf
     RewriteEngine on
     RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 </VirtualHost>
-
+```
 #### Microservice 1 – HTTP Config
+```cmd
 <VirtualHost *:80>
     ServerName microservice1.aditechsphere.publicvm.com
 
@@ -112,8 +113,10 @@ File: /etc/apache2/sites-available/aditechsphere.publicvm.com.conf
     RewriteEngine on
     RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 </VirtualHost>
+```
 
 ####  Microservice 2 – HTTP Config
+```cmd
 <VirtualHost *:80>
     ServerName microservice2.aditechsphere.publicvm.com
 
@@ -128,22 +131,25 @@ File: /etc/apache2/sites-available/aditechsphere.publicvm.com.conf
     RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 </VirtualHost>
 
-
-Enable sites:
-
+```
+#### Enable sites:
+```cmd
 sudo a2ensite aditechsphere.publicvm.com.conf
 sudo a2ensite microservice1.aditechsphere.publicvm.com.conf
 sudo a2ensite microservice2.aditechsphere.publicvm.com.conf
 sudo apachectl configtest
 sudo systemctl reload apache2
+```
 ## Enable HTTPS with Let’s Encrypt
 #### Install Certbot
+```cmd
 sudo apt install certbot python3-certbot-apache -y
-
+```
 #### Generate SSL Certificate
+```cmd
 sudo certbot --apache -d aditechsphere.publicvm.com
 
-
+```
 ##### Certbot:
 
 Verifies domain ownership
@@ -160,7 +166,7 @@ Each service has its own SSL VirtualHost using the same certificate.
 
 ###### Example (Homepage):
 
-
+```cmd
 
 <VirtualHost *:443>
     ServerName aditechsphere.publicvm.com
@@ -174,10 +180,11 @@ Each service has its own SSL VirtualHost using the same certificate.
     Include /etc/letsencrypt/options-ssl-apache.conf
 </VirtualHost>
 
-
+```
 (Same pattern for microservice1 and microservice2.)
 
 ##### Enable SSL:
+```cmd
 
 sudo a2enmod ssl
 sudo a2ensite aditechsphere.publicvm.com-le-ssl.conf
@@ -185,6 +192,7 @@ sudo a2ensite microservice1.aditechsphere.publicvm.com-le-ssl.conf
 sudo a2ensite microservice2.aditechsphere.publicvm.com-le-ssl.conf
 sudo apachectl configtest
 sudo systemctl reload apache2
+```
 
 ### 🔁 How HTTP Continues to Work After HTTPS
 
