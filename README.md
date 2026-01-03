@@ -1,55 +1,46 @@
-🚀 DevOps Microservices Platform
-HTTP → HTTPS with Apache Reverse Proxy on AWS EC2
-📌 Project Overview
+DevOps Microservices Platform
+🔐 HTTP → HTTPS with Apache Reverse Proxy on AWS EC2
+✨ What This Project Shows (At a Glance)
 
-This repository demonstrates a production-style DevOps microservices platform deployed on AWS EC2:
+✅ Production-style microservices architecture
+✅ Apache Reverse Proxy with subdomain routing
+✅ HTTP → HTTPS migration using Let’s Encrypt
+✅ Secure SSL termination at proxy level
+✅ Real DevOps deployment on AWS EC2
 
-✔ Microservices in Python (Flask)
-✔ Apache as a reverse proxy
-✔ Subdomain routing for services
-✔ HTTPS enabled via Let’s Encrypt / Certbot
-✔ Clean HTTP → HTTPS redirection
+🎯 Built to reflect real-world DevOps responsibilities, not just demos.
 
-The platform is designed to reflect real-world tasks that DevOps engineers handle—secure traffic routing, SSL termination, and scalable service isolation.
-
-🧠 High-Level Architecture
+🧠 Architecture Overview
 User Browser
-     |
-     | HTTPS (443)
-     v
+   |
+   | HTTPS (443)
+   v
 Apache Reverse Proxy (AWS EC2)
-     |
-     |– aditechsphere.publicvm.com
-     |     → Homepage Service (127.0.0.1:5000)
-     |
-     |– microservice1.aditechsphere.publicvm.com
-     |     → Orders Service (127.0.0.1:5001)
-     |
-     |– microservice2.aditechsphere.publicvm.com
-           → Payments Service (127.0.0.1:5002)
+   |
+   ├── aditechsphere.publicvm.com
+   |      → Homepage (127.0.0.1:5000)
+   |
+   ├── microservice1.aditechsphere.publicvm.com
+   |      → Orders Service (127.0.0.1:5001)
+   |
+   └── microservice2.aditechsphere.publicvm.com
+          → Payments Service (127.0.0.1:5002)
 
-🧩 Project Components
-Service	Description	Local Port
-Homepage Service	Main dashboard	📍 5000
-Orders Service	Orders microservice	📍 5001
-Payments Service	Payments microservice	📍 5002
-🚀 Tech Stack
-
-Python 3 & Flask
-
-Apache HTTP Server
-
-AWS EC2 (Ubuntu)
-
-DNS Subdomains
-
-Let’s Encrypt + Certbot
-
-Reverse Proxy & SSL Termination
-
-📂 Repository Structure
+🧩 Microservices
+Service	Purpose	Port
+🏠 Homepage	Main dashboard	5000
+🛒 Orders	Order management	5001
+💳 Payments	Payment processing	5002
+🧰 Tech Stack
+Layer	Technology
+Language	Python 3
+Framework	Flask
+Web Server	Apache
+Security	Let’s Encrypt (Certbot)
+Cloud	AWS EC2 (Ubuntu)
+Routing	Reverse Proxy + Subdomains
+📁 Project Structure
 microservices-app/
-│
 ├── homepage/
 │   └── app.py
 ├── microservice1/
@@ -58,163 +49,69 @@ microservices-app/
 │   └── app.py
 └── README.md
 
-🌐 Live Domain Mapping
-Domain	Service
+🌐 Live Subdomain Routing
+URL	Service
 aditechsphere.publicvm.com	Homepage
-microservice1.aditechsphere.publicvm.com	Orders Service
-microservice2.aditechsphere.publicvm.com	Payments Service
+microservice1.aditechsphere.publicvm.com	Orders
+microservice2.aditechsphere.publicvm.com	Payments
 
-All HTTP requests are redirected permanently to HTTPS.
+🔁 All HTTP traffic → HTTPS automatically
 
-🛠️ Deployment Guide
-1️⃣ Launch EC2 Instance
+⚙️ Deployment Flow (Simple View)
 
-✔ Ubuntu Server
-✔ Open Inbound Ports:
+1️⃣ Launch EC2 (Ubuntu)
+2️⃣ Run Flask apps on localhost
+3️⃣ Apache routes traffic via subdomains
+4️⃣ Certbot enables HTTPS
+5️⃣ Apache handles SSL termination
 
-80 (HTTP)
-
-443 (HTTPS)
-
-✔ Assign Elastic IP (recommended)
-
-2️⃣ Install Packages
-sudo apt update
-sudo apt install python3 python3-pip python3-venv apache2 -y
-
-
-Enable required Apache modules:
-
-sudo a2enmod proxy proxy_http headers rewrite ssl
-sudo systemctl restart apache2
-
-3️⃣ Setup Python Environment
-mkdir ~/microservices-app
-cd ~/microservices-app
-python3 -m venv venv
-source venv/bin/activate
-pip install flask
-
-4️⃣ Run Each Flask Microservice
-# Homepage
-python homepage/app.py
-
-# Orders Service
-python microservice1/app.py
-
-# Payments Service
-python microservice2/app.py
-
-5️⃣ DNS Configuration
-
-Add DNS A records:
-
-aditechsphere.publicvm.com              → EC2_IP
-microservice1.aditechsphere.publicvm.com → EC2_IP
-microservice2.aditechsphere.publicvm.com → EC2_IP
-
-6️⃣ Apache Reverse Proxy (HTTP → HTTPS)
-Homepage – HTTP Config
-<VirtualHost *:80>
-    ServerName aditechsphere.publicvm.com
-
-    ProxyPreserveHost On
-    ProxyPass / http://127.0.0.1:5000/
-    ProxyPassReverse / http://127.0.0.1:5000/
-
-    RewriteEngine On
-    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
-</VirtualHost>
-
-Orders – HTTP Config
-<VirtualHost *:80>
-    ServerName microservice1.aditechsphere.publicvm.com
-
-    ProxyPreserveHost On
-    ProxyPass / http://127.0.0.1:5001/
-    ProxyPassReverse / http://127.0.0.1:5001/
-
-    RewriteEngine On
-    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
-</VirtualHost>
-
-Payments – HTTP Config
-<VirtualHost *:80>
-    ServerName microservice2.aditechsphere.publicvm.com
-
-    ProxyPreserveHost On
-    ProxyPass / http://127.0.0.1:5002/
-    ProxyPassReverse / http://127.0.0.1:5002/
-
-    RewriteEngine On
-    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
-</VirtualHost>
-
-
-Enable sites & reload Apache:
-
-sudo a2ensite *.conf
-sudo apachectl configtest
-sudo systemctl reload apache2
-
-🔐 Enable HTTPS with Let’s Encrypt
-Install Certbot
-sudo apt install certbot python3-certbot-apache -y
-
-Run Certbot
-sudo certbot --apache -d aditechsphere.publicvm.com
-
-
-This will:
-✔ Validate DNS
-✔ Issue SSL cert
-✔ Configure Apache SSL settings
-✔ Set up auto-renewal
-
-Example HTTPS VirtualHost
-<VirtualHost *:443>
-    ServerName aditechsphere.publicvm.com
-
-    ProxyPreserveHost On
-    ProxyPass / http://127.0.0.1:5000/
-    ProxyPassReverse / http://127.0.0.1:5000/
-
-    SSLCertificateFile /etc/letsencrypt/live/aditechsphere.publicvm.com/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/aditechsphere.publicvm.com/privkey.pem
-    Include /etc/letsencrypt/options-ssl-apache.conf
-</VirtualHost>
-
-
-Repeat for other subdomains.
-
-🔁 HTTP & HTTPS Flow
-Flask (internal HTTP) 
-    ↓
+🔐 HTTPS Strategy (Real Production Model)
+Browser
+  ↓ HTTPS
 Apache (SSL Termination)
-    ↓
-HTTPS Served to Browser
+  ↓ HTTP (internal)
+Flask Microservices
 
 
-✔ Flask stays on HTTP internally
-✔ SSL is terminated at Apache
-✔ HTTP requests auto-redirect to HTTPS
+✔ Secure external traffic
+✔ Internal services remain isolated
+✔ Standard enterprise architecture
 
-🔒 Security Best Practices
+🔒 Security Highlights
 
-✔ Bind Flask apps to localhost
-✔ Firewall block internal ports
-✔ Use strong SSL configuration
-✔ Certbot auto-renews certificates
-✔ Apache as single trusted entry point
+🔐 SSL certificates auto-renewed
 
-🌟 Why This Project Matters for DevOps
+🔒 Flask apps bound to 127.0.0.1
 
-Real-world reverse proxy implementation
+🚪 Apache as single public entry point
 
-HTTPS enablement without downtime
+🔥 Internal ports can be firewalled
 
-Integration of DNS, Apache, certbot, and EC2
+🧱 Clear separation of edge & app layer
 
-Microservices with isolated service routing
+🌟 Why Recruiters Like This Project
 
-Can be extended to Docker, Kubernetes, ALB, etc.
+✅ Not a tutorial — real infra setup
+✅ Reverse proxy + SSL = core DevOps skill
+✅ Subdomain-based microservices
+✅ Clean, production-ready documentation
+✅ Easily extendable to Docker / Kubernetes / ALB
+
+🚀 Possible Extensions
+
+🐳 Docker & Docker Compose
+
+☸️ Kubernetes (EKS)
+
+🔁 CI/CD (GitHub Actions / Jenkins)
+
+📊 Monitoring (Prometheus + Grafana)
+
+⚖️ Load Balancing with ALB
+
+👨‍💻 Author
+
+Aditya Sirsam
+DevOps Engineer | AWS | Linux | Docker | Kubernetes
+
+📌 GitHub: https://github.com/DevOpsAutomatorAdi
