@@ -1,117 +1,307 @@
-DevOps Microservices Platform
-🔐 HTTP → HTTPS with Apache Reverse Proxy on AWS EC2
-✨ What This Project Shows (At a Glance)
+You can copy-paste this entire file directly into GitHub — no edits required.
 
-✅ Production-style microservices architecture
-✅ Apache Reverse Proxy with subdomain routing
-✅ HTTP → HTTPS migration using Let’s Encrypt
-✅ Secure SSL termination at proxy level
-✅ Real DevOps deployment on AWS EC2
+# 🚀 DevOps Microservices Platform  
+### HTTP → HTTPS using Apache Reverse Proxy on AWS EC2
 
-🎯 Built to reflect real-world DevOps responsibilities, not just demos.
 
-🧠 Architecture Overview
+::contentReference[oaicite:0]{index=0}
+
+
+---
+
+## 📌 Project Overview
+
+This project demonstrates a **production-grade DevOps microservices architecture** deployed on **AWS EC2** using **Python Flask**, **Apache Reverse Proxy**, and **HTTPS with Let’s Encrypt**.
+
+Multiple independent microservices run internally on HTTP and are securely exposed to users through **subdomain-based routing**. Apache acts as a **single secure entry point**, handling:
+
+- Reverse proxy routing  
+- SSL termination  
+- HTTP → HTTPS redirection  
+
+A key highlight of this project is a **real-world HTTP to HTTPS migration**, which is a critical responsibility of DevOps engineers in production environments.
+
+---
+
+## 🏗️ Architecture (Logical View)
+
+
+
 User Browser
-   |
-   | HTTPS (443)
-   v
+|
+| HTTPS (443)
+v
 Apache Reverse Proxy (AWS EC2)
-   |
-   ├── aditechsphere.publicvm.com
-   |      → Homepage (127.0.0.1:5000)
-   |
-   ├── microservice1.aditechsphere.publicvm.com
-   |      → Orders Service (127.0.0.1:5001)
-   |
-   └── microservice2.aditechsphere.publicvm.com
-          → Payments Service (127.0.0.1:5002)
+|
+|-- aditechsphere.publicvm.com
+| → Homepage Service (127.0.0.1:5000)
+|
+|-- microservice1.aditechsphere.publicvm.com
+| → Orders Service (127.0.0.1:5001)
+|
+|-- microservice2.aditechsphere.publicvm.com
+→ Payments Service (127.0.0.1:5002)
 
-🧩 Microservices
-Service	Purpose	Port
-🏠 Homepage	Main dashboard	5000
-🛒 Orders	Order management	5001
-💳 Payments	Payment processing	5002
-🧰 Tech Stack
-Layer	Technology
-Language	Python 3
-Framework	Flask
-Web Server	Apache
-Security	Let’s Encrypt (Certbot)
-Cloud	AWS EC2 (Ubuntu)
-Routing	Reverse Proxy + Subdomains
-📁 Project Structure
+
+---
+
+## 🧩 Microservices
+
+| Service Name | Description | Internal Port |
+|-------------|-------------|---------------|
+| Homepage Service | Central dashboard / landing page | 5000 |
+| Orders Service | Independent backend microservice | 5001 |
+| Payments Service | Independent backend microservice | 5002 |
+
+---
+
+## 🚀 Tech Stack
+
+- **Python 3**
+- **Flask**
+- **Apache HTTP Server**
+- **Reverse Proxy & SSL Termination**
+- **AWS EC2 (Ubuntu Linux)**
+- **DNS & Subdomains**
+- **Let’s Encrypt (Certbot)**
+
+---
+
+## 📂 Project Structure
+
+
+
 microservices-app/
+│
 ├── homepage/
-│   └── app.py
+│ └── app.py
+│
 ├── microservice1/
-│   └── app.py
+│ └── app.py
+│
 ├── microservice2/
-│   └── app.py
+│ └── app.py
+│
 └── README.md
 
-🌐 Live Subdomain Routing
-URL	Service
-aditechsphere.publicvm.com	Homepage
-microservice1.aditechsphere.publicvm.com	Orders
-microservice2.aditechsphere.publicvm.com	Payments
 
-🔁 All HTTP traffic → HTTPS automatically
+---
 
-⚙️ Deployment Flow (Simple View)
+## 🌐 Domain Mapping
 
-1️⃣ Launch EC2 (Ubuntu)
-2️⃣ Run Flask apps on localhost
-3️⃣ Apache routes traffic via subdomains
-4️⃣ Certbot enables HTTPS
-5️⃣ Apache handles SSL termination
+| Public URL | Service |
+|-----------|---------|
+| http://aditechsphere.publicvm.com | Homepage |
+| http://microservice1.aditechsphere.publicvm.com | Orders Service |
+| http://microservice2.aditechsphere.publicvm.com | Payments Service |
 
-🔐 HTTPS Strategy (Real Production Model)
-Browser
-  ↓ HTTPS
-Apache (SSL Termination)
-  ↓ HTTP (internal)
-Flask Microservices
+> ⚠️ All HTTP traffic is permanently redirected to HTTPS.
+
+---
+
+## 🛠️ Deployment Guide
+
+### 1️⃣ Launch EC2 Instance
+
+- Ubuntu Server
+- Open inbound ports:
+  - **80 (HTTP)**
+  - **443 (HTTPS)**
+- Attach **Elastic IP** (recommended)
+
+---
+
+### 2️⃣ Install Required Packages
+
+```bash
+sudo apt update
+sudo apt install python3 python3-pip python3-venv apache2 -y
 
 
-✔ Secure external traffic
-✔ Internal services remain isolated
-✔ Standard enterprise architecture
+Enable Apache modules:
+
+sudo a2enmod proxy proxy_http headers rewrite ssl
+sudo systemctl restart apache2
+
+3️⃣ Setup Python Virtual Environment
+mkdir ~/microservices-app
+cd ~/microservices-app
+python3 -m venv venv
+source venv/bin/activate
+pip install flask
+
+4️⃣ Run Flask Microservices
+# Homepage
+python homepage/app.py
+
+# Orders Service
+python microservice1/app.py
+
+# Payments Service
+python microservice2/app.py
+
+
+Internal ports:
+
+127.0.0.1:5000
+
+127.0.0.1:5001
+
+127.0.0.1:5002
+
+5️⃣ DNS Configuration
+
+Create A records pointing to EC2 public IP:
+
+aditechsphere.publicvm.com               → EC2_IP
+microservice1.aditechsphere.publicvm.com → EC2_IP
+microservice2.aditechsphere.publicvm.com → EC2_IP
+
+🔄 Apache Reverse Proxy (HTTP → HTTPS)
+Homepage – HTTP VirtualHost
+<VirtualHost *:80>
+    ServerName aditechsphere.publicvm.com
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:5000/
+    ProxyPassReverse / http://127.0.0.1:5000/
+
+    RewriteEngine On
+    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+Orders Service – HTTP VirtualHost
+<VirtualHost *:80>
+    ServerName microservice1.aditechsphere.publicvm.com
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:5001/
+    ProxyPassReverse / http://127.0.0.1:5001/
+
+    RewriteEngine On
+    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+Payments Service – HTTP VirtualHost
+<VirtualHost *:80>
+    ServerName microservice2.aditechsphere.publicvm.com
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:5002/
+    ProxyPassReverse / http://127.0.0.1:5002/
+
+    RewriteEngine On
+    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+
+Enable sites:
+
+sudo a2ensite *.conf
+sudo apachectl configtest
+sudo systemctl reload apache2
+
+🔐 Enable HTTPS with Let’s Encrypt
+Install Certbot
+sudo apt install certbot python3-certbot-apache -y
+
+Generate SSL Certificate
+sudo certbot --apache -d aditechsphere.publicvm.com
+
+
+Certbot automatically:
+
+Verifies domain ownership
+
+Issues SSL certificates
+
+Configures Apache
+
+Enables auto-renewal
+
+HTTPS VirtualHost Example
+<VirtualHost *:443>
+    ServerName aditechsphere.publicvm.com
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:5000/
+    ProxyPassReverse / http://127.0.0.1:5000/
+
+    SSLCertificateFile /etc/letsencrypt/live/aditechsphere.publicvm.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/aditechsphere.publicvm.com/privkey.pem
+    Include /etc/letsencrypt/options-ssl-apache.conf
+</VirtualHost>
+
+
+(Same pattern applies to other microservices.)
+
+🔁 HTTP & HTTPS Flow Explained
+Browser → HTTPS → Apache → HTTP → Flask
+
+
+✔ Flask runs internally on HTTP
+✔ Apache performs SSL termination
+✔ External traffic is fully encrypted
+
+This is standard production architecture.
 
 🔒 Security Highlights
 
-🔐 SSL certificates auto-renewed
+Flask services bound to localhost
 
-🔒 Flask apps bound to 127.0.0.1
+Apache is the only public entry point
 
-🚪 Apache as single public entry point
+SSL certificates auto-renew via Certbot
 
-🔥 Internal ports can be firewalled
+Internal ports can be firewalled
 
-🧱 Clear separation of edge & app layer
+Clear separation of edge & application layers
 
-🌟 Why Recruiters Like This Project
+🎯 Why This Project Is Valuable for DevOps Roles
 
-✅ Not a tutorial — real infra setup
-✅ Reverse proxy + SSL = core DevOps skill
-✅ Subdomain-based microservices
-✅ Clean, production-ready documentation
-✅ Easily extendable to Docker / Kubernetes / ALB
+Real Apache reverse-proxy setup
 
-🚀 Possible Extensions
+Practical HTTPS migration
 
-🐳 Docker & Docker Compose
+Subdomain-based microservices routing
 
-☸️ Kubernetes (EKS)
+Strong security posture
 
-🔁 CI/CD (GitHub Actions / Jenkins)
+Production-ready documentation
 
-📊 Monitoring (Prometheus + Grafana)
+Easily extendable to Docker, Kubernetes, ALB, CI/CD
 
-⚖️ Load Balancing with ALB
+🔮 Future Enhancements
+
+Docker & Docker Compose
+
+Kubernetes deployment
+
+CI/CD using GitHub Actions
+
+Monitoring with Prometheus & Grafana
+
+AWS ALB integration
 
 👨‍💻 Author
 
 Aditya Sirsam
 DevOps Engineer | AWS | Linux | Docker | Kubernetes
 
-📌 GitHub: https://github.com/DevOpsAutomatorAdi
+
+---
+
+### ✅ What this README fixes
+✔ Clean layout  
+✔ Professional tone  
+✔ Easy to scan for recruiters  
+✔ Proper headings & spacing  
+✔ Looks **premium on GitHub**
+
+If you want next:
+- 🔥 **Badges (AWS, HTTPS, Python, Apache)**
+- 📸 **Where to add your real screenshots**
+- 🐳 **Docker version README**
+- ☸️ **Kubernetes extension README**
+
+Just tell me.
