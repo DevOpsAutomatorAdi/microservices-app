@@ -1,6 +1,4 @@
-You can copy-paste this entire file directly into GitHub — no edits required.
-
-# 🚀 DevOps Microservices Platform  
+#  DevOps Microservices Platform  
 ### HTTP → HTTPS using Apache Reverse Proxy on AWS EC2
 
 
@@ -27,20 +25,15 @@ A key highlight of this project is a **real-world HTTP to HTTPS migration**, whi
 
 
 
-User Browser
-|
-| HTTPS (443)
-v
-Apache Reverse Proxy (AWS EC2)
-|
-|-- aditechsphere.publicvm.com
-| → Homepage Service (127.0.0.1:5000)
-|
-|-- microservice1.aditechsphere.publicvm.com
-| → Orders Service (127.0.0.1:5001)
-|
-|-- microservice2.aditechsphere.publicvm.com
-→ Payments Service (127.0.0.1:5002)
+flowchart TB
+    U[User Browser]
+
+    U -->|HTTPS 443| A[Apache Reverse Proxy<br/>(AWS EC2)]
+
+    A -->|aditechsphere.publicvm.com| H[Homepage Service<br/>127.0.0.1:5000]
+    A -->|microservice1.aditechsphere.publicvm.com| O[Orders Service<br/>127.0.0.1:5001]
+    A -->|microservice2.aditechsphere.publicvm.com| P[Payments Service<br/>127.0.0.1:5002]
+
 
 
 ---
