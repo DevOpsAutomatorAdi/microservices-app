@@ -3,11 +3,14 @@
 
 ---
 
-## 📌 Project Overview
+# 🚀 Secure Microservices Reverse Proxy Platform
 
-This project demonstrates a **production-grade DevOps microservices architecture** deployed on **AWS EC2** using **Python Flask**, **Apache Reverse Proxy**, and **HTTPS with Let’s Encrypt**.
+## 📌 Project Description
+Designed and deployed a **production-ready microservices platform** on **AWS EC2**, where multiple Python Flask microservices run internally over HTTP and are securely exposed to users via **HTTPS** using **Apache Reverse Proxy** and **Let’s Encrypt SSL**.
 
-Multiple independent microservices run internally on HTTP and are securely exposed to users through **subdomain-based routing**. Apache acts as a **single secure entry point** for SSL termination and routing.
+Each microservice is mapped to a **dedicated subdomain**, enabling clean service isolation, centralized SSL termination, and secure traffic routing. The architecture follows real-world DevOps best practices used in production environments.
+
+This project demonstrates **end-to-end DevOps ownership**, including Linux server setup, reverse proxy configuration, SSL automation, DNS routing, and security hardening.
 
 ---
 
@@ -28,6 +31,7 @@ flowchart TB
 ```
 
 ---
+
 
 ## 🧩 Microservices
 
